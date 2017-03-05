@@ -12,7 +12,7 @@
 
 #define RX_EN 3
 
-
+uint8_t checksum_hash(uint8_t *data, int packet_length);
 uint16_t crc16(uint8_t *data_p, unsigned short length);
 void extractPackets();
 void actOnPacket(char,char,char);
@@ -31,7 +31,7 @@ void setup() {
 
   /* wdt_enable(WDTO_500MS); */
   /* Serial.begin(9600); */
-  Serial.begin(600);
+  Serial.begin(9600);
   /* while(Serial.available()<=0); */
   /* writeByCommand(Serial.read()); */
   writeByCommand('e');
@@ -323,3 +323,28 @@ void rx_enable(){
   digitalWrite(RX_EN,HIGH);
   delay(SWITCHING_DELAY);
 }
+
+uint8_t checksum_hash(uint8_t *data) {
+
+  uint16_t total = 0; 
+  uint8_t packet_length = sizeof(data) / sizeof(uint8_t);
+
+  int i = 0;
+  for (i = 0; i < packet_length; i++) {
+
+    if (i != 1 && i != 2) {
+
+      total += data[i];
+    
+    }
+  
+  }
+
+  uint8_t low = total & 0xff;
+  uint8_t checksum = 0xff;
+  checksum = checksum - low;
+
+  return checksum;
+
+} 
+
